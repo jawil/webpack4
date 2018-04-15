@@ -108,6 +108,7 @@ module.exports = {
         options: {
           cacheDirectory: true,
           presets: ['react', 'stage-2', ['env', { modules: false }]],
+          // modules关闭 Babel 的模块转换功能，保留原本的 ES6 模块化语法
           plugins: ['transform-runtime', 'transform-decorators-legacy', 'react-hot-loader/babel']
         }
       },
@@ -122,7 +123,7 @@ module.exports = {
               useBabel: true,
               babelOptions: {
                 babelrc: false /* Important line */,
-                presets: ['react', 'stage-2', ['env', { modules: false }]],
+                presets: ['react', 'stage-2', ['env', { modules: false }]], // 关闭 Babel 的模块转换功能，保留原本的 ES6 模块化语法
                 plugins: ['transform-runtime', 'react-hot-loader/babel']
               }
             }
@@ -135,7 +136,7 @@ module.exports = {
             loader: 'babel-loader',
             options: {
               cacheDirectory: true,
-              presets:["react", "stage-2", ["env", { "modules": false }]],
+              presets:["react", "stage-2", ["env", { "modules": false }]],//关闭 Babel 的模块转换功能，保留原本的 ES6 模块化语法
               plugins: ['transform-runtime', 'react-hot-loader/babel']
             }
           },
