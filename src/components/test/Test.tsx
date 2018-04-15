@@ -25,7 +25,7 @@ class Test extends React.Component {
 
   render() {
     return (
-      <div className="wrap" style={{ border: '1px solid green' }} onClick={this.showInfo}>
+      <div className="wrap" style={{ border: '1px solid red' }} onClick={this.showInfo}>
         <span className="test">{this.state.name}</span>
       </div>
     );

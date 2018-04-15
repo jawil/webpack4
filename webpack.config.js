@@ -8,7 +8,6 @@ const CleanPlugin = require('clean-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const PostcssPxtorem = require('postcss-pxtorem');
 const AutoPrefixer = require('autoprefixer'); // eslint-disable-line
-const { CheckerPlugin } = require('awesome-typescript-loader');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -16,15 +15,16 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
 const svgDirs = [
   path.resolve(__dirname, 'src/my-project-svg-foler') // 自己私人的 svg 存放目录
 ];
+
 const env = process.env.NODE_ENV;
 
 module.exports = {
   devtool: env === 'production' ? false : 'cheap-module-eval-source-map',
-  entry: ['./src/app.tsx', 'react-hot-loader/patch'],
+  entry: { app: ['./src/app.tsx', 'react-hot-loader/patch'] },
   mode: env === 'production' ? 'production' : 'development',
   output: {
     path: BUILD_PATH, // 编译到当前目录
-    filename: 'app.js'
+    filename: '[name].js'
   },
   devServer: {
     contentBase: BUILD_PATH,
@@ -33,7 +33,7 @@ module.exports = {
     open: true,
     inline: true,
     port: 8888,
-    compress: true // 开发服务器是否启动gzip等压缩
+    compress: false // 开发服务器是否启动gzip等压缩
     /*  https: {
       key: fs.readFileSync('/path/to/server.key'),
       cert: fs.readFileSync('/path/to/server.crt'),
@@ -176,14 +176,18 @@ module.exports = {
       disable: false,
       allChunks: true
     }),
-    // new CheckerPlugin(),
-    // new ForkTsCheckerWebpackPlugin({
-    //   checkSyntacticErrors: true,
-    //   tsconfig: path.resolve(__dirname, 'tsconfig.json'),
-    //   tslint: path.resolve(__dirname, 'tslint.json'),
-    //   watch: ['./src/**/*.tsx'],
-    //   ignoreLints: ['no-console', 'object-literal-sort-keys', 'quotemark']
-    // }),
+    new webpack.DllReferencePlugin({
+      context: '.',
+      manifest: require('./build/react.manifest.json'), // eslint-disable-line
+      extensions: ['.js', '.jsx']
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      checkSyntacticErrors: true,
+      tsconfig: path.resolve(__dirname, 'tsconfig.json'),
+      tslint: path.resolve(__dirname, 'tslint.json'),
+      watch: ['./src/**/*.tsx'],
+      ignoreLints: ['no-console', 'object-literal-sort-keys', 'quotemark']
+    }),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]), // 忽略掉 d.ts 文件，避免因为编译生成 d.ts 文件导致又重新检查。
