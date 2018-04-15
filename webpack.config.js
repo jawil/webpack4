@@ -229,6 +229,24 @@ if (env === 'production') {
         sourceMap: true
       })
     ]
+    // 这个变化还是很大的，之前的webpack版本用的都是commonchunkplugin，但是webpack4开始使用common-chunk-and-vendor-chunk 配置如下:
+    /* splitChunks: {
+      cacheGroups: {
+        commons: {
+          chunks: 'initial',
+          minChunks: 2,
+          maxInitialRequests: 5, // The default limit is too small to showcase the effect
+          minSize: 0 // This is example is too small to create commons chunks
+        },
+        vendor: {
+          test: /node_modules/,
+          chunks: 'initial',
+          name: 'vendor',
+          priority: 10,
+          enforce: true
+        }
+      }
+    } */
   };
 
   module.exports.plugins = (module.exports.plugins || []).concat([
