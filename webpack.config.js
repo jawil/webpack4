@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
@@ -170,6 +171,9 @@ module.exports = {
       template: './src/index.html',
       inject: true, // 允许插件修改哪些内容，包括head与body
       hash: true // 为静态资源生成hash值
+    }),
+    new AddAssetHtmlPlugin({
+      filepath: path.resolve(__dirname, './build/*.dll.js')
     }),
     new ExtractTextPlugin({
       // 指定css文件名 打包成一个css
