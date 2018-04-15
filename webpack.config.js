@@ -107,7 +107,7 @@ module.exports = {
         loader: 'babel-loader',
         options: {
           cacheDirectory: true,
-          presets: ['env', 'react', 'stage-2'],
+          presets: ['react', 'stage-2', ['env', { modules: false }]],
           plugins: ['transform-runtime', 'transform-decorators-legacy', 'react-hot-loader/babel']
         }
       },
@@ -122,7 +122,7 @@ module.exports = {
               useBabel: true,
               babelOptions: {
                 babelrc: false /* Important line */,
-                presets: ['env', 'react', 'stage-2'],
+                presets: ['react', 'stage-2', ['env', { modules: false }]],
                 plugins: ['transform-runtime', 'react-hot-loader/babel']
               }
             }
@@ -135,7 +135,7 @@ module.exports = {
             loader: 'babel-loader',
             options: {
               cacheDirectory: true,
-              presets: ['env', 'react', 'stage-2'],
+              presets:["react", "stage-2", ["env", { "modules": false }]],
               plugins: ['transform-runtime', 'react-hot-loader/babel']
             }
           },

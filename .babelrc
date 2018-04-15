@@ -1,4 +1,5 @@
 {
-  "presets": ["env", "react", "stage-2"],
-  "plugins": ["transform-runtime", "transform-decorators-legacy", "react-hot-loader/babel"]
+  "presets": ["react", "stage-2", ["env", { "modules": false }]],
+  "plugins": ["transform-runtime", "transform-decorators-legacy", "react-hot-loader/babel"],
+  "comments": false
 }
