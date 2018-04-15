@@ -7,7 +7,6 @@ dist
 dev
 dest
 build
-test
 .vscode
 .idea.package
 npm-debug.log
