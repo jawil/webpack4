@@ -1,0 +1,16 @@
+node_modules
+~*
+*~
+.DS_Store
+.idea
+dist
+dev
+dest
+build
+test
+.vscode
+.idea.package
+npm-debug.log
+.package
+npm-debug.log.*
+.idea
