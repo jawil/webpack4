@@ -4,11 +4,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const AddAssetHtmlPlugin = require('add-asset-html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const CleanPlugin = require('clean-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const PostcssPxtorem = require('postcss-pxtorem');
 const AutoPrefixer = require('autoprefixer'); // eslint-disable-line
+const WebpackVersionPlugin = require('webpack-version-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -18,6 +20,8 @@ const svgDirs = [
 ];
 
 const env = process.env.NODE_ENV;
+const manifest = require('./build/vendor/react.manifest.json');
+const { theme } = require('./package.json');
 
 module.exports = {
   devtool: env === 'production' ? false : 'cheap-module-eval-source-map',
@@ -25,16 +29,21 @@ module.exports = {
   mode: env === 'production' ? 'production' : 'development',
   output: {
     path: BUILD_PATH, // 编译到当前目录
-    filename: '[name].js'
+    filename: 'js/[name].js'
   },
   devServer: {
+    publicPath: '/',
     contentBase: BUILD_PATH,
     historyApiFallback: true,
     hot: true,
     open: true,
     inline: true,
     port: 8888,
-    compress: false // 开发服务器是否启动gzip等压缩
+    host: 'localhost',
+    openPage: '',
+    proxy: {},
+    quiet: true,
+    compress: true // 开发服务器是否启动gzip等压缩
     /*  https: {
       key: fs.readFileSync('/path/to/server.key'),
       cert: fs.readFileSync('/path/to/server.crt'),
@@ -45,48 +54,49 @@ module.exports = {
     rules: [
       {
         test: /\.scss$/,
-        use: ExtractTextPlugin.extract({
+        // css-hot-loader会增加打包的体积
+        use:
+          env === 'production'
+            ? [MiniCssExtractPlugin.loader, 'css-loader?importLoaders=1', 'postcss-loader']
+            : [
+              'css-hot-loader',
+              MiniCssExtractPlugin.loader,
+              'css-loader?importLoaders=1',
+              'postcss-loader'
+            ]
+        /*  use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: [
-            'css-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                ident: 'postcss',
-                plugins: loader => [
-                  PostcssPxtorem({
-                    rootValue: 100,
-                    propWhiteList: ['*']
-                  }),
-                  AutoPrefixer({
-                    browsers: [
-                      'last 2 versions',
-                      'Firefox ESR',
-                      '> 1%',
-                      'ie >= 8',
-                      'iOS >= 8',
-                      'Android >= 4'
-                    ]
-                  })
-                ]
-              }
-            },
-            'sass-loader'
-          ]
-        })
+          use: ['css-hot-loader', 'css-loader', 'postcss-loader', 'sass-loader']
+        }) */
       },
       {
         test: /\.less$/,
         use: [
+          'css-hot-loader',
           { loader: 'style-loader', options: { sourceMap: true } },
           { loader: 'css-loader', options: { sourceMap: true } },
-          { loader: 'less-loader', options: { sourceMap: true } }
+          {
+            loader: 'postcss-loader',
+            options: {
+              ident: 'postcss',
+              plugins: loader => [
+                PostcssPxtorem({
+                  rootValue: 100,
+                  propWhiteList: ['*']
+                }),
+                AutoPrefixer({
+                  browsers: ['last 2 versions', '> 1%', 'ie >= 8']
+                })
+              ]
+            }
+          },
+          { loader: 'less-loader', options: { sourceMap: true, modifyVars: theme } }
         ]
       },
       {
         test: /\.css$/,
         include: [path.resolve('src')],
-        use: ['style-loader', 'css-loader']
+        use: ['css-hot-loader', 'style-loader', 'css-loader', 'postcss-loader']
       },
       {
         test: /\.jsx?$/,
@@ -173,18 +183,21 @@ module.exports = {
       hash: true // 为静态资源生成hash值
     }),
     new AddAssetHtmlPlugin({
-      filepath: path.resolve(__dirname, './build/*.dll.js')
+      filepath: path.resolve(__dirname, 'build/vendor/*.dll.js')
     }),
     new ExtractTextPlugin({
       // 指定css文件名 打包成一个css
-      filename: 'index.css',
+      filename: 'css/[name].css',
       disable: false,
       allChunks: true
     }),
     new webpack.DllReferencePlugin({
-      context: '.',
-      manifest: require('./build/react.manifest.json'), // eslint-disable-line
+      context: __dirname,
+      manifest,
       extensions: ['.js', '.jsx']
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].css'
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true,
@@ -196,8 +209,13 @@ module.exports = {
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.WatchIgnorePlugin([/\.js$/, /\.d\.ts$/]), // 忽略掉 d.ts 文件，避免因为编译生成 d.ts 文件导致又重新检查。
-    new webpack.optimize.ModuleConcatenationPlugin()
+    new webpack.optimize.ModuleConcatenationPlugin(),
     // 3.0新功能 范围提升 （Scope Hoisting ）,作用域提升，这是在webpack3中所提出来的。它会使代码体积更小，因为函数申明语句会产生大量代码.
+    new WebpackVersionPlugin({
+      cb: (hashMap) => {
+        console.log(hashMap);
+      }
+    })
   ],
 
   resolve: {
