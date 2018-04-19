@@ -14,7 +14,6 @@ class Test extends React.Component {
 
   showInfo() {
     console.log(this.state.name);
-
     function show(a: number, b: string) {
       console.log(12211);
       return a + b;
