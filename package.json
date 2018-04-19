@@ -9,6 +9,8 @@
   "pre-commit": [
     "lint"
   ],
+  "lint": "eslint --ext .js --ext .jsx --ext .vue src/",
+  "lint-fix": "eslint --fix --ext .js --ext .jsx --ext .vue src/",
   "dependencies": {
     "classnames": "^2.2.5",
     "core-decorators": "^0.20.0",
@@ -44,6 +46,7 @@
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-standard": "^11.0.0",
     "eslint-loader": "^2.0.0",
+    "eslint-plugin-html": "^4.0.3",
     "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-node": "^6.0.1",
@@ -81,7 +84,7 @@
     "webpack-version-plugin": "^2.0.1"
   },
   "scripts": {
-    "start": "cross-env NODE_ENV=development webpack-dev-server  --progress",
+    "start": "cross-env NODE_ENV=development webpack-dev-server",
     "build": "cross-env NODE_ENV=production webpack --display-used-exports --progress --hide-modules",
     "dll": "webpack --config webpack.dll.config.js --mode production"
   },
